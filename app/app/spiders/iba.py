@@ -14,6 +14,7 @@ class IBASpider(scrapy.Spider):
             yield {
                 'name': page_name,
                 'url': response.url,
+                # TODO : Decide how to parse the ingredients list. save as string or list?
                 'ingredients': "\n".join(response.css('div.elementor-shortcode ul').css('li::text').getall()),
                 # TODO: Add method and garnish processing
             }
