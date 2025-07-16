@@ -10,13 +10,18 @@ class IBASpider(scrapy.Spider):
 
     def parse(self, response):
         page_name = response.css('h1.elementor-heading-title')[0].xpath('text()').get().strip()
-        if page_name != 'All Cocktails':
+        sections = [x for x in response.css('div.elementor-shortcode') if x.css('p')]
+
+        if page_name != 'All Cocktails' and len(sections) > 1:
+            method, garnish = sections[0], sections[1]
+
             yield {
                 'name': page_name,
-                'url': response.url,
                 # TODO : Decide how to parse the ingredients list. save as string or list?
                 'ingredients': "\n".join(response.css('div.elementor-shortcode ul').css('li::text').getall()),
-                # TODO: Add method and garnish processing
+                'method': [''.join(x.css('::text').getall()) for x in method.css('p')],
+                'garnish': [''.join(x.css('::text').getall()) for x in garnish.css('p')],
+                'url': response.url,
             }
 
 
